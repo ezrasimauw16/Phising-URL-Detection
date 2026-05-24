@@ -1,141 +1,223 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — PhishGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
-
 <body>
 
-<div class="container">
-
-    <h1>Admin Dashboard</h1>
-
-    <div class="dashboard">
-
-        <div class="card">
-            <h2>Total Scan</h2>
-            <p>{{ stats.total_scan }}</p>
-        </div>
-
-        <div class="card">
-            <h2>Safe URL</h2>
-            <p>{{ stats.total_safe }}</p>
-        </div>
-
-        <div class="card">
-            <h2>Phishing URL</h2>
-            <p>{{ stats.total_phishing }}</p>
-        </div>
-
-        <div class="card">
-            <h2>Threat Rate</h2>
-            <p>{{ threat_rate }}%</p>
-        </div>
-        
-        <div class="charts">
-
-    <div class="chart-box">
-        <h2>Threat Distribution</h2>
-        <canvas id="pieChart"></canvas>
-    </div>
-
-    <div class="chart-box">
-        <h2>Safe vs Phishing</h2>
-        <canvas id="barChart"></canvas>
-    </div>
-
-</div>
-
-    </div>
-
-    <h2>Latest Scans</h2>
-
-    <table>
-
-        <tr>
-            <th>URL</th>
-            <th>Status</th>
-            <th>Confidence</th>
-        </tr>
-
-        {% for row in history %}
-
-        <tr>
-
-            <td>{{ row[1] }}</td>
-
-            <td>{{ row[2] }}</td>
-
-            <td>{{ row[3] }}%</td>
-
-        </tr>
-
-        {% endfor %}
-
-    </table>
-<a href="/">
-        <button>Back</button>
+<nav class="nav">
+    <a href="/" class="nav-brand">
+        <div class="shield">🛡</div>
+        PhishGuard
     </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/admin" class="active">Admin</a></li>
+        <li><a href="/about">About</a></li>
+    </ul>
+</nav>
 
-</div>
+<main class="page-wide">
+
+    <div class="page-header animate-in">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+                <h3>Dashboard</h3>
+                <h1>Admin Panel</h1>
+                <p class="subtitle" style="margin-top:4px;">Overview of scan activity and model statistics.</p>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:auto;">
+                <a href="/export" class="btn btn-secondary btn-sm">↓ Export CSV</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid animate-in delay-1">
+        <div class="stat-card accent">
+            <div class="sc-label">Total Scans</div>
+            <div class="sc-value">{{ stats.total_scan }}</div>
+        </div>
+        <div class="stat-card safe-card">
+            <div class="sc-label">Safe URLs</div>
+            <div class="sc-value">{{ stats.total_safe }}</div>
+        </div>
+        <div class="stat-card danger-card">
+            <div class="sc-label">Phishing URLs</div>
+            <div class="sc-value">{{ stats.total_phishing }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">Phishing Rate</div>
+            <div class="sc-value">{{ threat_rate }}%</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid animate-in delay-2">
+        <div class="chart-card">
+            <h2>Scan Results Distribution</h2>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Scans Over Time</h2>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Scans Table -->
+    <div class="animate-in delay-3">
+        <div class="section-header">
+            <h2>Recent Scans</h2>
+            <a href="/history" class="btn btn-secondary btn-sm">View All →</a>
+        </div>
+
+        {% if history %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:48px;">#</th>
+                        <th>URL</th>
+                        <th style="width:110px;">Status</th>
+                        <th style="width:110px;">Confidence</th>
+                        <th style="width:160px;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in history %}
+                    <tr>
+                        <td style="color:var(--text-muted); font-size:0.8125rem;">{{ row[0] }}</td>
+                        <td class="td-mono">{{ row[1] }}</td>
+                        <td>
+                            {% if row[2] == "PHISHING" %}
+                            <span class="badge badge-danger">⚠ Phishing</span>
+                            {% elif row[2] == "SAFE" %}
+                            <span class="badge badge-safe">✓ Safe</span>
+                            {% else %}
+                            <span class="badge badge-warn">? {{ row[2] }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-family:var(--font-mono); font-size:0.875rem;">{{ row[3] }}%</td>
+                        <td style="color:var(--text-secondary); font-size:0.8125rem;">{{ row[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card" style="text-align:center; padding:3rem 1.5rem;">
+            <div style="font-size:2rem; margin-bottom:12px;">📭</div>
+            <p style="color:var(--text-secondary); font-size:0.9375rem;">No scans yet. <a href="/" style="color:var(--accent);">Scan your first URL.</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Model Info -->
+    <div class="card animate-in delay-4" style="margin-top:1.5rem;">
+        <h2>Model Information</h2>
+        <div class="divider"></div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px;">
+            <div class="feature-item">
+                <div class="fi-label">Algorithm</div>
+                <div class="fi-value" style="font-size:0.95rem;">Logistic Reg.</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Vectorizer</div>
+                <div class="fi-value" style="font-size:0.95rem;">TF-IDF</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Accuracy</div>
+                <div class="fi-value">91.95%</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Training URLs</div>
+                <div class="fi-value">10,000</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions-row animate-in">
+        <a href="/" class="btn btn-primary">← Back to Scanner</a>
+    </div>
+
+</main>
+
 <script>
-
-const safeCount = {{ safe_count }};
-const phishingCount = {{ phishing_count }};
-
-const pieCtx = document
-    .getElementById('pieChart')
-    .getContext('2d');
-
-new Chart(pieCtx, {
-    type: 'pie',
-    data: {
-        labels: [
-            'Safe',
-            'Phishing'
-        ],
-        datasets: [{
-            data: [
-                safeCount,
-                phishingCount
-            ]
-        }]
-    }
+document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
 });
 
-const barCtx = document
-    .getElementById('barChart')
-    .getContext('2d');
-
-new Chart(barCtx, {
-    type: 'bar',
+// Pie / Doughnut Chart
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+    type: 'doughnut',
     data: {
-        labels: [
-            'Safe',
-            'Phishing'
-        ],
+        labels: ['Safe', 'Phishing'],
         datasets: [{
-            label: 'Total URL',
-            data: [
-                safeCount,
-                phishingCount
-            ]
+            data: [{{ safe_count }}, {{ phishing_count }}],
+            backgroundColor: ['#ecfdf5', '#fef2f2'],
+            borderColor: ['#0f7a55', '#b91c1c'],
+            borderWidth: 2,
+            hoverOffset: 6
         }]
     },
     options: {
-        responsive: true
+        responsive: true,
+        cutout: '65%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: { family: 'DM Sans', size: 12 },
+                    color: '#4a6080',
+                    padding: 16
+                }
+            }
+        }
     }
 });
 
+// Line Chart
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+new Chart(lineCtx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_labels | tojson }},
+        datasets: [{
+            label: 'Scans',
+            data: {{ chart_data | tojson }},
+            borderColor: '#3b9eff',
+            backgroundColor: 'rgba(59,158,255,0.08)',
+            borderWidth: 2,
+            pointBackgroundColor: '#3b9eff',
+            pointRadius: 4,
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: {
+                grid: { color: '#cde0fb' },
+                ticks: { font: { family: 'DM Sans', size: 11 }, color: '#89a4c0' }
+            },
+            y: {
+                grid: { color: '#cde0fb' },
+                ticks: { font: { family: 'DM Sans', size: 11 }, color: '#89a4c0', stepSize: 1 },
+                beginAtZero: true
+            }
+        }
+    }
+});
 </script>
-
 
 </body>
 </html>

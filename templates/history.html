@@ -3,52 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan History</title>
+    <title>Scan History — PhishGuard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<div class="container">
-
-    <h1>Scan History</h1>
-
-    <a href="/export">
-    <button>
-        Export CSV
-    </button>
-</a>
-
-    <table>
-
-        <tr>
-            <th>ID</th>
-            <th>URL</th>
-            <th>Status</th>
-            <th>Confidence</th>
-            <th>Date</th>
-        </tr>
-
-        {% for row in history %}
-
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}%</td>
-            <td>{{ row[4] }}</td>
-        </tr>
-
-        {% endfor %}
-
-    </table>
-
-    <br>
-
-    <a href="/">
-        <button>Back</button>
+<nav class="nav">
+    <a href="/" class="nav-brand">
+        <div class="shield">🛡</div>
+        PhishGuard
     </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/history" class="active">History</a></li>
+        <li><a href="/admin">Admin</a></li>
+        <li><a href="/about">About</a></li>
+    </ul>
+</nav>
 
-</div>
+<main class="page-wide">
+
+    <div class="page-header animate-in">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+                <h3>Records</h3>
+                <h1>Scan History</h1>
+                <p class="subtitle" style="margin-top:4px;">All previously scanned URLs and their results.</p>
+            </div>
+            <a href="/export" class="btn btn-secondary btn-sm" style="margin-top:auto;">
+                ↓ Export CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="animate-in delay-1">
+        {% if history %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:48px;">#</th>
+                        <th>URL</th>
+                        <th style="width:110px;">Status</th>
+                        <th style="width:110px;">Confidence</th>
+                        <th style="width:160px;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in history %}
+                    <tr>
+                        <td style="color:var(--text-muted); font-size:0.8125rem;">{{ row[0] }}</td>
+                        <td class="td-mono">{{ row[1] }}</td>
+                        <td>
+                            {% if row[2] == "PHISHING" %}
+                            <span class="badge badge-danger">⚠ Phishing</span>
+                            {% elif row[2] == "SAFE" %}
+                            <span class="badge badge-safe">✓ Safe</span>
+                            {% else %}
+                            <span class="badge badge-warn">? {{ row[2] }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-family:var(--font-mono); font-size:0.875rem;">{{ row[3] }}%</td>
+                        <td style="color:var(--text-secondary); font-size:0.8125rem;">{{ row[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card" style="text-align:center; padding:3rem 1.5rem;">
+            <div style="font-size:2rem; margin-bottom:12px;">📭</div>
+            <p style="color:var(--text-secondary); font-size:0.9375rem;">No scans yet. <a href="/" style="color:var(--accent);">Scan your first URL.</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="actions-row animate-in delay-2">
+        <a href="/" class="btn btn-primary">← Back to Scanner</a>
+    </div>
+
+</main>
+
+<script>
+document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+});
+</script>
 
 </body>
 </html>

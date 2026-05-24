@@ -82,3 +82,29 @@ def get_statistics():
         "total_safe": total_safe,
         "total_phishing": total_phishing
     }
+
+def get_chart_data():
+
+    conn = sqlite3.connect(DATABASE)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT DATE(scan_date) as day, COUNT(*)
+        FROM scan_history
+        GROUP BY day
+        ORDER BY day DESC
+        LIMIT 7
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    # Reverse so oldest date is on the left
+    rows = list(reversed(rows))
+
+    labels = [row[0] for row in rows]
+    data   = [row[1] for row in rows]
+
+    return labels, data

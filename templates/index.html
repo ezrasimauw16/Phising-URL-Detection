@@ -1,43 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PhishGuard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard — URL Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<h1>PhishGuard</h1>
+<nav class="nav">
+    <a href="/" class="nav-brand">
+        <div class="shield">🛡</div>
+        PhishGuard
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/" class="active">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/admin">Admin</a></li>
+        <li><a href="/about">About</a></li>
+    </ul>
+</nav>
 
-<div class="menu">
+<main class="page">
 
-    <a href="/">Home</a>
+    <div class="hero animate-in">
+        <div class="hero-icon">🔍</div>
+        <h1>Is this URL safe?</h1>
+        <p class="subtitle">Paste any link below to instantly detect phishing threats using machine learning.</p>
+    </div>
 
-    <a href="/history">History</a>
+    <div class="card animate-in delay-1">
+        <form action="/scan" method="POST" id="scanForm">
+            <label for="urlInput" style="display:block; font-size:0.875rem; font-weight:500; margin-bottom:8px; color:var(--text-secondary);">
+                Enter a URL to scan
+            </label>
+            <div class="input-group">
+                <input
+                    class="url-input"
+                    type="text"
+                    id="urlInput"
+                    name="url"
+                    placeholder="https://example.com/some/path"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    required
+                >
+                <button type="submit" class="btn btn-primary" id="scanBtn">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="btnText">Scan URL</span>
+                </button>
+            </div>
+        </form>
 
-    <a href="/about">About</a>
+        {% if error %}
+        <div class="error-msg">
+            ⚠ {{ error }}
+        </div>
+        {% endif %}
+    </div>
 
-</div>
+    <div class="animate-in delay-2" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-top:1rem;">
+        <div class="card" style="text-align:center; padding:1.25rem;">
+            <div style="font-size:1.5rem; margin-bottom:6px;">🤖</div>
+            <div style="font-size:0.8125rem; font-weight:600; color:var(--text-primary);">ML-Powered</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">Logistic Regression + TF-IDF</div>
+        </div>
+        <div class="card" style="text-align:center; padding:1.25rem;">
+            <div style="font-size:1.5rem; margin-bottom:6px;">⚡</div>
+            <div style="font-size:0.8125rem; font-weight:600; color:var(--text-primary);">Instant Results</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">Confidence score included</div>
+        </div>
+        <div class="card" style="text-align:center; padding:1.25rem;">
+            <div style="font-size:1.5rem; margin-bottom:6px;">📊</div>
+            <div style="font-size:0.8125rem; font-weight:600; color:var(--text-primary);">91.95% Accuracy</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">Trained on 10,000 URLs</div>
+        </div>
+    </div>
 
-<form action="/scan" method="POST">
+</main>
 
-    <input
-        type="text"
-        name="url"
-        placeholder="Enter URL"
-        required
-    >
+<script>
+const form = document.getElementById('scanForm');
+const btn  = document.getElementById('scanBtn');
+const spinner = document.getElementById('spinner');
+const btnText = document.getElementById('btnText');
+const toggle  = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
 
-    <button type="submit">
-        Scan URL
-    </button>
-    
+form.addEventListener('submit', () => {
+    btn.classList.add('btn-loading');
+    spinner.style.display = 'block';
+    btnText.textContent = 'Scanning…';
+});
 
-</form>
-    {% if error %}
+toggle.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+});
+</script>
 
-<p class="error">
-    {{ error }}
-</p>
-
-{% endif %}
 </body>
 </html>

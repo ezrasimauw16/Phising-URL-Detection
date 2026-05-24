@@ -3,93 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan Result</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Scan Result — PhishGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<div class="container">
+<nav class="nav">
+    <a href="/" class="nav-brand">
+        <div class="shield">🛡</div>
+        PhishGuard
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/admin">Admin</a></li>
+        <li><a href="/about">About</a></li>
+    </ul>
+</nav>
 
-    <h1>Analysis Result</h1>
+<main class="page">
 
-    <div class="result-card">
-
-        <p><strong>URL:</strong></p>
-        <p>{{ url }}</p>
-
-        <br>
-
-        <p><strong>Status:</strong></p>
-
+    <div class="page-header animate-in">
+        <h3>Scan Result</h3>
+        <h1>Analysis complete</h1>
+    </div>
+    <div class="card animate-in delay-1">
         {% if result == "PHISHING" %}
-
-            <p class="danger">
-                ⚠️ PHISHING
-            </p>
-
+        <div class="result-status danger">
+            <div class="result-icon">⚠️</div>
+            <div>
+                <div class="result-label">Phishing Detected</div>
+                <div class="result-sublabel">This URL shows characteristics of a phishing attempt.</div>
+            </div>
+        </div>
         {% elif result == "SAFE" %}
-
-            <p class="safe">
-                ✅ SAFE
-            </p>
-
+        <div class="result-status safe">
+            <div class="result-icon">✅</div>
+            <div>
+                <div class="result-label">URL is Safe</div>
+                <div class="result-sublabel">No phishing indicators were found.</div>
+            </div>
+        </div>
         {% else %}
-
-            <p class="invalid">
-                ❌ INVALID URL
-            </p>
-
+        <div class="result-status warn">
+            <div class="result-icon">❌</div>
+            <div>
+                <div class="result-label">Invalid URL</div>
+                <div class="result-sublabel">The URL format is not recognised. Please check and try again.</div>
+            </div>
+        </div>
         {% endif %}
 
-        <br>
-
-        <p><strong>Confidence:</strong></p>
-        <p>{{ confidence }}%</p>
-
-        <div class="result-box">
-
-            <h3>Risk Analysis</h3>
-
-            <ul>
-                {% for reason in reasons %}
-                    <li>{{ reason }}</li>
-                {% endfor %}
-            </ul>
-
+        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:6px;">
+            Scanned URL
         </div>
+        <div class="url-display">{{ url }}</div>
 
+        {% if confidence %}
+        <div class="confidence-wrap">
+            <div class="confidence-label">
+                <span>Confidence</span>
+                <strong>{{ confidence }}%</strong>
+            </div>
+            <div class="confidence-bar">
+                <div
+                    class="confidence-fill {% if result == 'SAFE' %}safe{% elif result == 'PHISHING' %}danger{% endif %}"
+                    id="confBar"
+                    style="width: 0%"
+                ></div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-
-    {% if features %}
-
-    <div class="feature-box">
-
-        <h3>Feature Analysis</h3>
-
-        <ul>
-            <li>URL Length : {{ features[0] }}</li>
-            <li>Digit Count : {{ features[1] }}</li>
-            <li>Special Characters : {{ features[2] }}</li>
-            <li>Subdomains : {{ features[3] }}</li>
-            <li>HTTPS : {{ features[4] }}</li>
-            <li>Suspicious Words : {{ features[5] }}</li>
-            <li>Contains IP : {{ features[6] }}</li>
-            <li>Shortened URL : {{ features[7] }}</li>
+    {% if reasons %}
+    <div class="card animate-in delay-2">
+        <h2 style="margin-bottom:4px;">Risk Analysis</h2>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:0;">Indicators found during URL inspection.</p>
+        <ul class="risk-list" style="margin-top:1rem;">
+            {% for reason in reasons %}
+            <li class="{% if 'tidak' in reason.lower() or 'terlalu' in reason.lower() or 'mencurigakan' in reason.lower() or 'menggunakan' in reason.lower() %}risk-bad{% else %}risk-ok{% endif %}">
+                <span class="dot"></span>
+                {{ reason }}
+            </li>
+            {% endfor %}
         </ul>
-
     </div>
-
+    {% endif %}
+    {% if features %}
+    <div class="card animate-in delay-3">
+        <h2 style="margin-bottom:4px;">Feature Analysis</h2>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:0;">Extracted lexical characteristics of the URL.</p>
+        <div class="feature-grid" style="margin-top:1rem;">
+            <div class="feature-item">
+                <div class="fi-label">URL Length</div>
+                <div class="fi-value">{{ features[0] }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Digit Count</div>
+                <div class="fi-value">{{ features[1] }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Special Chars</div>
+                <div class="fi-value">{{ features[2] }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Subdomains</div>
+                <div class="fi-value">{{ features[3] }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">HTTPS</div>
+                <div class="fi-value">{{ "Yes" if features[4] == 1 else "No" }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Suspicious Words</div>
+                <div class="fi-value">{{ features[5] }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Contains IP</div>
+                <div class="fi-value">{{ "Yes" if features[6] == 1 else "No" }}</div>
+            </div>
+            <div class="feature-item">
+                <div class="fi-label">Shortened URL</div>
+                <div class="fi-value">{{ "Yes" if features[7] == 1 else "No" }}</div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
-    <a href="/">
-        <button>
-            Scan Another URL
-        </button>
-    </a>
+    <div class="actions-row animate-in delay-4">
+        <a href="/" class="btn btn-primary">← Scan Another URL</a>
+        <a href="/history" class="btn btn-secondary">View History</a>
+    </div>
 
-</div>
+</main>
+
+<script>
+document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+});
+
+window.addEventListener('load', () => {
+    const bar = document.getElementById('confBar');
+    if (bar) {
+        setTimeout(() => {
+            bar.style.width = '{{ confidence }}%';
+        }, 120);
+    }
+});
+</script>
 
 </body>
 </html>

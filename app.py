@@ -11,6 +11,7 @@ from feature_extractor import explain_url
 from db_helper import get_history
 from db_helper import save_scan
 from db_helper import get_statistics
+from db_helper import get_chart_data
 
 import csv
 
@@ -149,13 +150,17 @@ def admin():
             2
         )
 
+    chart_labels, chart_data = get_chart_data()
+
     return render_template(
         "admin.html",
         stats=stats,
         threat_rate=threat_rate,
         history=history[:10],
         safe_count=stats["total_safe"],
-        phishing_count=stats["total_phishing"]
+        phishing_count=stats["total_phishing"],
+        chart_labels=chart_labels,
+        chart_data=chart_data
     )
     
 @app.route("/export")
@@ -197,4 +202,3 @@ def about():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    

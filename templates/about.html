@@ -3,79 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Project</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <title>About — PhishGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<div class="container">
+<nav class="nav">
+    <a href="/" class="nav-brand">
+        <div class="shield">🛡</div>
+        PhishGuard
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/admin">Admin</a></li>
+        <li><a href="/about" class="active">About</a></li>
+    </ul>
+</nav>
 
-    <h1>About Phishing Detection System</h1>
+<main class="page">
 
-    <div class="card">
-
-        <h2>Project Description</h2>
-
-        <p>
-            Sistem ini digunakan untuk mendeteksi URL phishing
-            menggunakan Machine Learning dan analisis fitur URL.
+    <div class="page-header animate-in">
+        <h3>Project</h3>
+        <h1>About PhishGuard</h1>
+        <p class="subtitle" style="margin-top:4px;">A machine learning–powered URL phishing detection system.</p>
+    </div>
+    <div class="card animate-in delay-1">
+        <h2>What is PhishGuard?</h2>
+        <p style="margin-top:0.75rem; font-size:0.9375rem; color:var(--text-secondary); line-height:1.75;">
+            PhishGuard analyses URLs in real time using a combination of TF-IDF character n-grams and hand-crafted lexical features to classify whether a link is safe or a potential phishing threat. Results include a confidence score and a breakdown of suspicious indicators.
         </p>
-
+    </div>
+    <div class="card animate-in delay-2">
         <h2>Dataset</h2>
-
-        <p>
-            Dataset berasal dari Kaggle dengan kategori:
+        <p style="margin-top:0.5rem; font-size:0.875rem; color:var(--text-secondary);">
+            Source: Kaggle — <em>Malicious URLs Dataset</em>. The training set uses 10,000 balanced samples across four categories:
         </p>
+        <div class="about-grid" style="margin-top:0.875rem;">
+            <div class="about-item"><span class="ai-icon">🟢</span> Benign URLs</div>
+            <div class="about-item"><span class="ai-icon">🔴</span> Phishing URLs</div>
+            <div class="about-item"><span class="ai-icon">🟠</span> Malware URLs</div>
+            <div class="about-item"><span class="ai-icon">🟡</span> Defacement URLs</div>
+        </div>
+    </div>
+    <div class="card animate-in delay-3">
+        <h2>Machine Learning Pipeline</h2>
+        <div class="about-grid" style="margin-top:0.875rem;">
+            <div class="about-item"><span class="ai-icon">📝</span> TF-IDF (char n-grams 2–4)</div>
+            <div class="about-item"><span class="ai-icon">🔬</span> Lexical Feature Extraction</div>
+            <div class="about-item"><span class="ai-icon">⚖️</span> Standard Scaler</div>
+            <div class="about-item"><span class="ai-icon">🧮</span> Logistic Regression</div>
+        </div>
 
-        <ul>
-            <li>Benign URL</li>
-            <li>Phishing URL</li>
-            <li>Malware URL</li>
-            <li>Defacement URL</li>
-        </ul>
+        <div class="divider"></div>
 
-        <p>
-            Total data training yang digunakan:
-            <strong>10.000 URL</strong>
-        </p>
-
-        <h2>Machine Learning</h2>
-
-        <ul>
-            <li>TF-IDF Vectorizer</li>
-            <li>Lexical Feature Extraction</li>
-            <li>Logistic Regression</li>
-        </ul>
-
-        <h2>Model Performance</h2>
-
-        <p>
-            Accuracy:
-            <strong>91.95%</strong>
-        </p>
-
-        <h2>Technologies</h2>
-
-        <ul>
-            <li>Python</li>
-            <li>Flask</li>
-            <li>SQLite</li>
-            <li>HTML</li>
-            <li>CSS</li>
-            <li>Scikit-Learn</li>
-        </ul>
-
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <div>
+                <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted);">Model Accuracy</div>
+                <div style="font-size:2rem; font-weight:600; font-family:var(--font-mono); color:var(--accent); letter-spacing:-0.03em; margin-top:2px;">91.95%</div>
+            </div>
+            <div style="flex:1; min-width:160px;">
+                <div class="confidence-bar" style="height:8px;">
+                    <div class="confidence-fill safe" id="accuracyBar" style="width:0%"></div>
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:5px;">Evaluated on 20% held-out test set</div>
+            </div>
+        </div>
+    </div>
+    <div class="card animate-in delay-4">
+        <h2>Technology Stack</h2>
+        <div class="about-grid" style="margin-top:0.875rem;">
+            <div class="about-item"><span class="ai-icon">🐍</span> Python 3</div>
+            <div class="about-item"><span class="ai-icon">🌶</span> Flask</div>
+            <div class="about-item"><span class="ai-icon">🗄</span> SQLite</div>
+            <div class="about-item"><span class="ai-icon">🤖</span> Scikit-Learn</div>
+            <div class="about-item"><span class="ai-icon">🌐</span> HTML / CSS</div>
+            <div class="about-item"><span class="ai-icon">📦</span> Joblib + SciPy</div>
+        </div>
     </div>
 
-    <a href="/">
-        <button>
-            Back to Home
-        </button>
-    </a>
+    <div class="actions-row animate-in">
+        <a href="/" class="btn btn-primary">← Back to Scanner</a>
+    </div>
 
-</div>
+</main>
+
+<script>
+document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+});
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const bar = document.getElementById('accuracyBar');
+        if (bar) bar.style.transition = 'width 0.8s cubic-bezier(0.4,0,0.2,1)';
+        if (bar) bar.style.width = '91.95%';
+    }, 150);
+});
+</script>
 
 </body>
 </html>
